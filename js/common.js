@@ -34,5 +34,9 @@ const dot=(m,p,q,name,col,dir)=>{const a=m.T(q),d=dir||unit(q),o=p.fontSize*.95;
 const lab=(m,p,q,dir,txt,col)=>{const a=m.T(q),o=p.fontSize*.9;return Draw.t(a[0]+dir[0]*o,a[1]-dir[1]*o,txt,p,{c:col,w:700,b:'central',fs:p.fontSize*.85})};
 const sq=(m,V,A,B,s,col,w)=>{const u=unit(sub(A,V)),v=unit(sub(B,V)),a=add(V,mul(u,s)),c=add(V,mul(v,s));return `<polyline points="${[a,add(a,mul(v,s)),c].map(q=>m.T(q).join(',')).join(' ')}" fill="none" stroke="${col}" stroke-width="${Math.max(1.5,w*.6)}"/>`};
 const circ=(m,c,r,a)=>{const o=m.T(c);return `<circle cx="${o[0]}" cy="${o[1]}" r="${r*m.k}" ${a}/>`};
-Draw.g={X2,defs,view,ln,lineS,arc,ang,between,dot,lab,sq,circ};
+// texto alineado con el segmento P1–P2, fuera de la figura (se aleja del punto ref); k = distancia en alturas de letra
+const sideLab=(m,p,P1,P2,t,col,ref,k=1,fsz)=>{fsz=fsz||p.fontSize*.8;const a=m.T(P1),b=m.T(P2),r=m.T(ref),c=[(a[0]+b[0])/2,(a[1]+b[1])/2],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;let n=[-dy/l,dx/l];if(n[0]*(c[0]-r[0])+n[1]*(c[1]-r[1])<0)n=[-n[0],-n[1]];
+ const x=c[0]+n[0]*fsz*k*1.1,y=c[1]+n[1]*fsz*k*1.1;let an=Math.atan2(dy,dx)*180/Math.PI;if(an>90)an-=180;if(an<-90)an+=180;
+ return `<g transform="rotate(${an} ${x} ${y})">${Draw.t(x,y,t,p,{c:col,w:700,b:'central',fs:fsz})}</g>`};
+Draw.g={X2,defs,view,ln,lineS,arc,ang,between,dot,lab,sq,circ,sideLab};
 })();

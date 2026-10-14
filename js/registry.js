@@ -4,6 +4,7 @@ const Registry={
   {id:'geometry',name:'Geometría',icon:'📐',planned:[]},
   {id:'area',name:'Perímetro y área',icon:'📏',planned:[]},
   {id:'solids',name:'Cuerpos geométricos',icon:'🧊',planned:[]},
+  {id:'theorems',name:'Teoremas y trigonometría',icon:'🔺',planned:[]},
   {id:'fractions',name:'Números y fracciones',icon:'🔢',planned:[]},
   {id:'data',name:'Datos y estadística',icon:'📊',planned:[]},
   {id:'functions',name:'Funciones',icon:'📈',planned:[]},

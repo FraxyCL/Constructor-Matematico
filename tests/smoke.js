@@ -31,4 +31,15 @@ s=ar({preset:'lens'});ck('lente',near(val(s,/achurada ≈ ([\d,]+)/),32*Math.aco
 s=ar({preset:'circSq'});ck('círculo−cuadrado inscrito',near(val(s,/achurada ≈ ([\d,]+)/),16*Math.PI-32,.01));
 s=ar({preset:'track'});ck('pista: área y perímetro',near(val(s,/total de la figura ≈ ([\d,]+)/),32+4*Math.PI,.01)&&near(val(s,/Perímetro de la figura ≈ ([\d,]+)/),16+4*Math.PI,.05));
 s=ar({preset:'rosette'});ck('cuadrado con 4 círculos',near(val(s,/achurada ≈ ([\d,]+)/),64-16*Math.PI,.01));
+// teoremas y trigonometría
+s=run('pyth');ck('pitágoras 3-4-5',has(s,'a² + b² = c²')&&has(s,'3² + 4² = 9 + 16 = 25 = 5²')&&has(s,'terna pitagórica'));
+s=run('pyth',{find:'c'});ck('pitágoras: hipotenusa x',has(s,'c = √(3² + 4²) = √25 = 5 cm')&&has(s,'c = x')&&has(s,'c² = x²'));
+const pp=mk(R.get('pyth'),{trip:'51213'});ck('terna 5-12-13',pp.a===5&&pp.b===12);const pc=mk(R.get('pyth'),{},{a:6});R.get('pyth').normalize(pc);ck('medidas libres al editar',pc.trip==='custom');
+s=run('pyth-proof');ck('demostración',has(s,'c² = a² + b²')&&has(s,'25 = 9 + 16'));
+s=run('thales-lines');ck('thales paralelas: razón',has(s,'razón = 1,5'));s=run('thales-lines',{find:'AB'});ck('thales paralelas: despeje',has(s,'x = ')&&has(s,'AB = x'));
+s=run('thales-triangle');ck('thales triángulo: razón',has(s,'razón = 0,4'));s=run('thales-triangle',{find:'DE'});ck('thales: DE',has(s,'= 2,4 cm')&&has(s,'DE = x'));
+s=run('thales-triangle',{fig:'x'});ck('thales en X',has(s,'AB / AD = AC / AE = BC / DE'));
+s=run('trig-ratios');ck('razones 35°',has(s,'0,574')&&has(s,'0,819')&&has(s,'0,7'));s=run('trig-ratios',{find:'opp'});ck('trig despeje',has(s,'x = 10 · sen 35° = 5,736 cm'));
+s=run('trig-circle',{th:30});ck('circunferencia goniométrica',has(s,'sen θ = 0,5')&&has(s,'cos θ = 0,866'));s=run('trig-circle',{th:90});ck('tan 90° no definida',has(s,'no definida'));
+s=run('trig-table',{form:'both'});ck('tabla notables',has(s,'√3')&&has(s,'≈ 0,866'));
 console.log(bad?`\n${bad} FALLAS`:'\nTodo en orden',`(${n} renders, ${items.length} construcciones)`);process.exit(bad?1:0);
