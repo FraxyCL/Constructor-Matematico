@@ -1,6 +1,6 @@
 // Circunferencia: círculo y sus elementos, tangentes desde un punto, ángulos en la circunferencia, dos circunferencias y corona circular
 (()=>{
-const {P,C,K}=Registry.h;
+const {P,C,K,M,S}=Registry.h;
 const ts=()=>Registry.h.ts(24);
 const UN=()=>({key:'unit',label:'Unidad de medida',type:'text',def:'cm',group:'Mostrar'});
 const xp=(key,label,show)=>({...Registry.extParam(key,label,show),group:'Rectas'});
@@ -12,16 +12,16 @@ const {X2,defs,view,ln,lineS,arc,ang,between,dot,lab,sq,circ}=Draw.g;
 // ---------- Circunferencia y círculo ----------
 Registry.register({id:'circle',category:'circles',name:'Circunferencia y círculo',icon:'⭕',description:'Radio, diámetro, cuerda, arco, secante, tangente, recta exterior, sector y segmento',
  parameters:[{key:'kind',label:'Figura',type:'select',def:'circ',group:'Figura',options:[['circ','Circunferencia (solo contorno)'],['disc','Círculo (con relleno)']]},P('r','Radio (cm)',4,1,10,'Figura',{step:.5}),
-  K('showCenter','Centro O',true,'Elementos'),K('showRad','Radio',true,'Elementos'),P('radAng','Ángulo del radio (°)',40,0,359,'Elementos',{show:p=>p.showRad}),
-  K('showDia','Diámetro',false,'Elementos'),P('diaAng','Ángulo del diámetro (°)',0,0,179,'Elementos',{show:p=>p.showDia}),
-  K('showCho','Cuerda',false,'Elementos'),P('c1','Extremo 1 de la cuerda (°)',200,0,359,'Elementos',{show:p=>p.showCho}),P('c2','Extremo 2 de la cuerda (°)',340,0,359,'Elementos',{show:p=>p.showCho}),
-  K('showArc','Arco',false,'Elementos'),P('a1','Inicio del arco (°)',30,0,359,'Elementos',{show:p=>p.showArc}),P('a2','Fin del arco (°)',120,0,359,'Elementos',{show:p=>p.showArc}),
+  K('showCenter','Centro O',true,'Elementos'),K('showRad','Radio',true,'Elementos'),P('radAng','Ángulo del radio (°)',40,0,359,'Elementos',{show:p=>p.showRad}),M('lmRad','Texto del radio','both','Elementos',p=>p.showRad),
+  K('showDia','Diámetro',false,'Elementos'),P('diaAng','Ángulo del diámetro (°)',0,0,179,'Elementos',{show:p=>p.showDia}),M('lmDia','Texto del diámetro','both','Elementos',p=>p.showDia),
+  K('showCho','Cuerda',false,'Elementos'),P('c1','Extremo 1 de la cuerda (°)',200,0,359,'Elementos',{show:p=>p.showCho}),P('c2','Extremo 2 de la cuerda (°)',340,0,359,'Elementos',{show:p=>p.showCho}),M('lmCho','Texto de la cuerda','both','Elementos',p=>p.showCho),
+  K('showArc','Arco',false,'Elementos'),P('a1','Inicio del arco (°)',30,0,359,'Elementos',{show:p=>p.showArc}),P('a2','Fin del arco (°)',120,0,359,'Elementos',{show:p=>p.showArc}),M('lmArc','Texto del arco','both','Elementos',p=>p.showArc),
   K('showSec','Secante',false,'Rectas'),P('s1','Primer punto de corte (°)',110,0,359,'Rectas',{show:p=>p.showSec}),P('s2','Segundo punto de corte (°)',250,0,359,'Rectas',{show:p=>p.showSec}),xp('xSec','Prolongar secante (%)',p=>p.showSec),
   K('showTan','Tangente',false,'Rectas'),P('tAng','Punto de tangencia (°)',270,0,359,'Rectas',{show:p=>p.showTan}),K('showPerp','Radio y ángulo recto en la tangencia',true,'Rectas',p=>p.showTan),xp('xTan','Prolongar tangente (%)',p=>p.showTan),
   K('showExt','Recta exterior',false,'Rectas'),P('extDist','Distancia de la recta al centro (cm)',6,p=>p.r+.5,20,'Rectas',{step:.5,show:p=>p.showExt}),P('extAng','Orientación de la recta (°)',60,0,359,'Rectas',{show:p=>p.showExt}),xp('xExt','Prolongar recta exterior (%)',p=>p.showExt),
-  K('showSct','Sector circular',false,'Regiones'),P('sA1','Inicio del sector (°)',0,0,359,'Regiones',{show:p=>p.showSct}),P('sA2','Fin del sector (°)',60,0,359,'Regiones',{show:p=>p.showSct}),
+  K('showSct','Sector circular',false,'Regiones'),P('sA1','Inicio del sector (°)',0,0,359,'Regiones',{show:p=>p.showSct}),P('sA2','Fin del sector (°)',60,0,359,'Regiones',{show:p=>p.showSct}),M('lmSct','Texto del sector','val','Regiones',p=>p.showSct),
   K('showSeg','Segmento circular',false,'Regiones'),P('gA1','Inicio del segmento (°)',200,0,359,'Regiones',{show:p=>p.showSeg}),P('gA2','Fin del segmento (°)',340,0,359,'Regiones',{show:p=>p.showSeg}),
-  K('showPts','Puntos con nombre (A, B, C…)',true,'Mostrar'),K('showLabels','Rotular medidas (r, d, cuerda, arco…)',true,'Mostrar'),K('showPA','Mostrar longitud y área',false,'Mostrar'),UN(),...circStyle()],
+  K('showPts','Puntos con nombre (A, B, C…)',true,'Mostrar'),K('showPA','Mostrar longitud y área',false,'Mostrar'),UN(),...circStyle()],
  normalize(p){p.extDist=Math.max(p.extDist,p.r+.5)},
  render(p,W,H){const r=p.r,fs=p.fontSize,disc=p.kind==='disc',u=p.unit,below=p.showPA?fs*(disc?3.4:1.9):0,E=Math.max(1.4*r,p.showExt?p.extDist*1.1:0),m=view(p,W,H,E,below),O=[0,0],lw=Math.max(2,p.strokeW*.8),
   sA=span(p.sA1,p.sA2),sG=span(p.gA1,p.gA2),sR=span(p.a1,p.a2);let g=defs(W,H),pts='',lb='';
@@ -37,12 +37,12 @@ Registry.register({id:'circle',category:'circles',name:'Circunferencia y círcul
   if(p.showCho)g+=ln(m,pol(p.c1,r),pol(p.c2,r),CL.cho,lw);
   if(p.showDia)g+=ln(m,pol(p.diaAng+180,r),pol(p.diaAng,r),CL.dia,lw);
   if(p.showRad)g+=ln(m,O,pol(p.radAng,r),CL.rad,lw);
-  if(p.showLabels){
-   if(p.showRad)lb+=lab(m,p,pol(p.radAng,r/2),pol(p.radAng+90),`r = ${f(r)} ${u}`,CL.rad);
-   if(p.showDia)lb+=lab(m,p,pol(p.diaAng,r/2),pol(p.diaAng-90),`d = ${f(2*r)} ${u}`,CL.dia);
-   if(p.showCho){const M=mul(add(pol(p.c1,r),pol(p.c2,r)),.5);lb+=lab(m,p,M,len(M)>1e-6?unit(M):[0,1],`DE = ${f(2*r*Math.sin(span(p.c1,p.c2)/2*D))} ${u}`,CL.cho)}
-   if(p.showArc&&sR>0)lb+=lab(m,p,pol(p.a1+sR/2,r),pol(p.a1+sR/2),`arco FG = ${f(sR)}°`,CL.arc);
-   if(p.showSct&&sA>0)lb+=lab(m,p,pol(p.sA1+sA/2,r*.55),[0,0],`${f(sA)}°`,'#fff')}
+  {const tx=(k,nm,v)=>Draw.lbl(p[k],nm,v),L1=tx('lmRad','r',`${f(r)} ${u}`),L2=tx('lmDia','d',`${f(2*r)} ${u}`);
+   if(p.showRad&&L1)lb+=lab(m,p,pol(p.radAng,r/2),pol(p.radAng+90),L1,CL.rad);
+   if(p.showDia&&L2)lb+=lab(m,p,pol(p.diaAng,r/2),pol(p.diaAng-90),L2,CL.dia);
+   if(p.showCho){const M0=mul(add(pol(p.c1,r),pol(p.c2,r)),.5),L3=tx('lmCho','DE',`${f(2*r*Math.sin(span(p.c1,p.c2)/2*D))} ${u}`);if(L3)lb+=lab(m,p,M0,len(M0)>1e-6?unit(M0):[0,1],L3,CL.cho)}
+   if(p.showArc&&sR>0){const L4=tx('lmArc','arco FG',`${f(sR)}°`);if(L4)lb+=lab(m,p,pol(p.a1+sR/2,r),pol(p.a1+sR/2),L4,CL.arc)}
+   if(p.showSct&&sA>0){const L5=tx('lmSct','α',`${f(sA)}°`);if(L5)lb+=lab(m,p,pol(p.sA1+sA/2,r*.55),[0,0],L5,'#fff')}}
   if(p.showCenter)pts+=dot(m,p,O,p.showPts?'O':'',p.stroke,[-.7,-.7]);
   if(p.showPts){const d=(a,n,c)=>pts+=dot(m,p,pol(a,r),n,c);
    if(p.showRad)d(p.radAng,'A',CL.rad);if(p.showDia){d(p.diaAng+180,'B',CL.dia);d(p.diaAng,'C',CL.dia)}if(p.showCho){d(p.c1,'D',CL.cho);d(p.c2,'E',CL.cho)}
@@ -69,17 +69,17 @@ Registry.register({id:'circle-tangents',category:'circles',name:'Tangentes desde
 Registry.register({id:'circle-angles',category:'circles',name:'Ángulos en la circunferencia',icon:'∠',description:'Ángulo central, inscrito y semiinscrito, con su arco y la relación entre ellos',
  parameters:[{key:'kind',label:'Tipo de ángulo',type:'select',def:'inscribed',group:'Ángulo',options:[['central','Ángulo central'],['inscribed','Ángulo inscrito'],['semi','Ángulo semiinscrito']]},
   P('r','Radio (cm)',4,1,10,'Ángulo',{step:.5}),P('a','Posición del punto A (°)',20,0,359,'Ángulo'),P('b','Posición del punto B (°)',140,0,359,'Ángulo'),P('cAng','Posición del vértice C (°)',260,0,359,'Ángulo',{show:p=>p.kind==='inscribed'}),
-  K('showCentral','Mostrar el ángulo central correspondiente',true,'Mostrar',p=>p.kind!=='central'),K('showArc','Resaltar el arco AB',true,'Mostrar'),K('showVal','Mostrar medidas',true,'Mostrar'),K('showRel','Mostrar la relación (fórmula)',true,'Mostrar'),K('showPts','Puntos con nombre',true,'Mostrar'),K('showDisc','Rellenar círculo',false,'Mostrar'),...circStyle()],
+  K('showCentral','Mostrar el ángulo central correspondiente',true,'Mostrar',p=>p.kind!=='central'),K('showArc','Resaltar el arco AB',true,'Mostrar'),S('lm','Texto de los ángulos y del arco','val','Mostrar',[['off','Sin texto'],['val','Solo el valor'],['name','Solo el nombre'],['both','Nombre y valor']]),K('showRel','Mostrar la relación (fórmula)',true,'Mostrar'),K('showPts','Puntos con nombre',true,'Mostrar'),K('showDisc','Rellenar círculo',false,'Mostrar'),...circStyle()],
  normalize(p){if(span(p.a,p.b)===0)p.b=(p.a+30)%360;if(p.kind==='inscribed'){const lim=360-span(p.a,p.b),o=span(p.b,p.cAng),mg=Math.min(5,lim/2);if(o<mg||o>lim-mg)p.cAng=Math.round((p.b+lim/2)%360)}},
- render(p,W,H){const r=p.r,fs=p.fontSize,s=span(p.a,p.b),A=pol(p.a,r),B=pol(p.b,r),O=[0,0],Cc=pol(p.cAng,r),m=view(p,W,H,1.45*r,p.showRel?fs*1.9:0),lw=Math.max(2,p.strokeW*.8),val=x=>p.showVal?`${f(x)}°`:'',rays=(V,Q,col,d)=>Q.map(q=>ln(m,V,q,col,lw,d)).join('');
+ render(p,W,H){const r=p.r,fs=p.fontSize,s=span(p.a,p.b),A=pol(p.a,r),B=pol(p.b,r),O=[0,0],Cc=pol(p.cAng,r),m=view(p,W,H,1.45*r,p.showRel?fs*1.9:0),lw=Math.max(2,p.strokeW*.8),val=(x,nm)=>Draw.lbl(p.lm,nm,`${f(x)}°`),rays=(V,Q,col,d)=>Q.map(q=>ln(m,V,q,col,lw,d)).join('');
   let g='',pts='',rel='';if(p.showDisc)g+=circ(m,O,r,`fill="${p.fill}" fill-opacity="${p.op/100}"`);g+=circ(m,O,r,`fill="none" stroke="${p.stroke}" stroke-width="${p.strokeW}"`);
   if(p.showArc)g+=`<path d="${arc(m,O,r,p.a,s)}" fill="none" stroke="${CL.arc}" stroke-width="${p.strokeW*1.8}" stroke-linecap="round"/>`;
   const cen=p.kind==='central'||p.showCentral;
-  if(cen)g+=rays(O,[A,B],CL.rad,p.kind==='central'?0:'6 4')+ang(m,p,O,p.a,s,.3*r,CL.rad,val(s));
+  if(cen)g+=rays(O,[A,B],CL.rad,p.kind==='central'?0:'6 4')+ang(m,p,O,p.a,s,.3*r,CL.rad,val(s,'∠AOB'));
   if(p.kind==='central')rel=`∠AOB = arco AB = ${f(s)}°`;
-  else if(p.kind==='inscribed'){g+=rays(Cc,[A,B],CL.dia);const[st,sp]=between(Cc,A,B);g+=ang(m,p,Cc,st,sp,.22*r,CL.dia,val(s/2));rel=`∠ACB = ½ · arco AB = ½ · ${f(s)}° = ${f(s/2)}°`}
-  else{const v=pol(p.a+90);g+=ln(m,A,B,CL.dia,lw)+ln(m,sub(A,mul(v,.9*r)),add(A,mul(v,.9*r)),CL.tan,lw);const[st,sp]=between(A,add(A,v),B);g+=ang(m,p,A,st,sp,.22*r,CL.dia,val(s/2));rel=`∠(tangente, AB) = ½ · arco AB = ½ · ${f(s)}° = ${f(s/2)}°`}
-  if(p.showArc&&p.showVal)g+=lab(m,p,pol(p.a+s/2,r),pol(p.a+s/2),`arco AB = ${f(s)}°`,CL.arc);
+  else if(p.kind==='inscribed'){g+=rays(Cc,[A,B],CL.dia);const[st,sp]=between(Cc,A,B);g+=ang(m,p,Cc,st,sp,.22*r,CL.dia,val(s/2,'∠ACB'));rel=`∠ACB = ½ · arco AB = ½ · ${f(s)}° = ${f(s/2)}°`}
+  else{const v=pol(p.a+90);g+=ln(m,A,B,CL.dia,lw)+ln(m,sub(A,mul(v,.9*r)),add(A,mul(v,.9*r)),CL.tan,lw);const[st,sp]=between(A,add(A,v),B);g+=ang(m,p,A,st,sp,.22*r,CL.dia,val(s/2,'α'));rel=`∠(tangente, AB) = ½ · arco AB = ½ · ${f(s)}° = ${f(s/2)}°`}
+  {const at=Draw.lbl(p.lm,'arco AB',`${f(s)}°`);if(p.showArc&&at)g+=lab(m,p,pol(p.a+s/2,r),pol(p.a+s/2),at,CL.arc)}
   if(p.showPts){pts+=dot(m,p,A,'A',p.stroke)+dot(m,p,B,'B',p.stroke);if(cen)pts+=dot(m,p,O,'O',p.stroke,[-.7,-.7]);if(p.kind==='inscribed')pts+=dot(m,p,Cc,'C',p.stroke)}
   if(p.showRel)g+=Draw.t(W/2,m.tH+m.av+fs*1.3,rel,p,{fs:fs*.85});
   return Draw.title(p,W)+g+pts}});

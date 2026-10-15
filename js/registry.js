@@ -40,8 +40,8 @@ const Draw={
 // Visibilidad selectiva: casillas "Ángulo en A…" y "Lado AB…" (claves angV{i} / sideV{i}); build() las respeta.
 // count: nº de vértices (número o p=>número); max: tope de casillas.
 Registry.vis=(count,max=count)=>{const cnt=p=>typeof count==='function'?count(p):count,N='ABCDEFGHIJKLMNOPQRST',o=[];
- for(let i=0;i<max;i++)o.push({key:'angV'+i,label:'Ángulo en '+N[i],type:'check',def:true,group:'Ángulos visibles',show:p=>p.showA&&i<cnt(p)});
- for(let i=0;i<max;i++)o.push({key:'sideV'+i,label:p=>'Lado '+N[i]+N[(i+1)%cnt(p)],type:'check',def:true,group:'Lados visibles',show:p=>p.showM&&i<cnt(p)});
+ for(let i=0;i<max;i++)o.push({key:'angV'+i,label:'Ángulo en '+N[i],type:'select',options:Registry.h.LM,def:'val',group:'Ángulos visibles',show:p=>p.showA&&i<cnt(p)});
+ for(let i=0;i<max;i++)o.push({key:'sideV'+i,label:p=>'Lado '+N[i]+N[(i+1)%cnt(p)],type:'select',options:Registry.h.LM,def:'val',group:'Lados visibles',show:p=>p.showM&&i<cnt(p)});
  return o};
 // Recta auxiliar con prolongación: x = % de prolongación en cada extremo (se recorta al lienzo, no cambia el tamaño de la figura)
 Registry.seg=(a,b,c,d,x=0)=>{const s={a,b,c,d};if(x>0){const k=x/100,v=[b[0]-a[0],b[1]-a[1]];s.ea=[a[0]-v[0]*k,a[1]-v[1]*k];s.eb=[b[0]+v[0]*k,b[1]+v[1]*k]}return s};

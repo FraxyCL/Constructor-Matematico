@@ -1,6 +1,6 @@
 // Razones trigonométricas: triángulo rectángulo, circunferencia goniométrica y tabla de ángulos notables
 (()=>{
-const {P,C,K,S}=Registry.h,ts=()=>Registry.h.ts(24),D=Math.PI/180,{rot,add,sub,mul,unit,pol}=Draw.v,{view,ln,sq,dot,ang,between,arc,circ,sideLab}=Draw.g;
+const {P,C,K,S,M}=Registry.h,ts=()=>Registry.h.ts(24),D=Math.PI/180,{rot,add,sub,mul,unit,pol}=Draw.v,{view,ln,sq,dot,ang,between,arc,circ,sideLab}=Draw.g;
 const TN={sin:'sen',cos:'cos',tan:'tan',csc:'cosec',sec:'sec',cot:'cotan'};
 const mkNf=d=>x=>(Math.round(x*10**d)/10**d+0).toLocaleString('es-CL',{maximumFractionDigits:d});
 
@@ -10,25 +10,25 @@ const RT=[['rsin','sin','opp','hyp'],['rcos','cos','adj','hyp'],['rtan','tan','o
 Registry.register({id:'trig-ratios',category:'theorems',name:'Razones trigonométricas',icon:'📐',description:'Seno, coseno, tangente y sus recíprocas en un triángulo rectángulo, con cálculo de un lado',
  parameters:[S('mode','Datos del triángulo','ang','Triángulo',[['ang','Ángulo y hipotenusa'],['legs','Los dos catetos']]),S('ref','Ángulo de referencia (θ)','A','Triángulo',[['A','En el vértice A (izquierda)'],['C','En el vértice C (arriba)']]),
   P('theta','Ángulo θ (°)',35,5,85,'Triángulo',{show:p=>p.mode==='ang'}),P('hyp','Hipotenusa (cm)',10,2,20,'Triángulo',{step:.5,show:p=>p.mode==='ang'}),
-  P('lx','Cateto horizontal AB (cm)',8,1,20,'Triángulo',{step:.5,show:p=>p.mode==='legs'}),P('ly','Cateto vertical BC (cm)',6,1,20,'Triángulo',{step:.5,show:p=>p.mode==='legs'}),P('rot','Giro de la figura (°)',0,0,359,'Triángulo'),
+  P('lx','Cateto horizontal AB (cm)',8,1,20,'Triángulo',{step:.5,show:p=>p.mode==='legs'}),P('ly','Cateto vertical BC (cm)',6,1,20,'Triángulo',{step:.5,show:p=>p.mode==='legs'}),P('rot','Giro de la figura (°)',0,0,359,'Triángulo'),K('flipH','Espejo horizontal (voltear izquierda ↔ derecha)',false,'Triángulo'),K('flipV','Espejo vertical (voltear arriba ↔ abajo)',false,'Triángulo'),
   S('find','Lado que se pide calcular (x)','none','Resolución',[['none','Ninguno (mostrar todas las medidas)'],['opp','Cateto opuesto'],['adj','Cateto adyacente'],['hyp','Hipotenusa']]),
-  K('sdO','Cateto opuesto',true,'Lados visibles'),K('sdA','Cateto adyacente',true,'Lados visibles'),K('sdH','Hipotenusa',true,'Lados visibles'),K('showVal','Mostrar las medidas',true,'Lados visibles'),S('lab','Nombre de los lados','words','Lados visibles',[['words','Cateto opuesto, adyacente, hipotenusa'],['letters','a, b, c']]),K('colorSides','Colorear los lados',true,'Lados visibles'),
-  K('anT','Ángulo θ',true,'Ángulos visibles'),K('anR','Ángulo recto',true,'Ángulos visibles'),K('anO','El otro ángulo agudo',false,'Ángulos visibles'),K('showPts','Nombrar los vértices A, B y C',true,'Mostrar'),
+  M('mO','Cateto opuesto','both','Lados: qué texto mostrar'),M('mA','Cateto adyacente','both','Lados: qué texto mostrar'),M('mH','Hipotenusa','both','Lados: qué texto mostrar'),S('lab','Nombre de los lados','words','Lados: qué texto mostrar',[['words','Cateto opuesto, adyacente, hipotenusa'],['letters','a, b, c']]),K('colorSides','Colorear los lados',true,'Lados: qué texto mostrar'),
+  M('nT','Ángulo θ','both','Ángulos: qué texto mostrar'),M('nR','Ángulo recto (90°)','mark','Ángulos: qué texto mostrar',undefined,Registry.h.LMR),M('nO','El otro ángulo agudo (φ)','off','Ángulos: qué texto mostrar'),K('showPts','Nombrar los vértices A, B y C',true,'Mostrar'),
   K('rsin','Seno (sen θ)',true,'Razones a escribir'),K('rcos','Coseno (cos θ)',true,'Razones a escribir'),K('rtan','Tangente (tan θ)',true,'Razones a escribir'),K('rcsc','Cosecante',false,'Razones a escribir'),K('rsec','Secante',false,'Razones a escribir'),K('rcot','Cotangente',false,'Razones a escribir'),P('dec','Decimales',3,0,5,'Razones a escribir'),Registry.h.UN(),
   C('col','Color del triángulo','#fef3c7','Estilo'),C('stroke','Color del contorno','#1e293b','Estilo'),P('strokeW','Grosor del contorno',3,1,10,'Estilo',{style:true}),P('size','Tamaño de la figura (%)',75,30,100,'Estilo',{style:true}),...ts()],
- render(p,W,H){const G=geo(p),fs=p.fontSize,u=p.unit,nf=mkNf(p.dec),xx=p.ref==='A'?G.adj:G.opp,yy=p.ref==='A'?G.opp:G.adj,th=p.rot*D,R=q=>rot(q,th),[A,B,Cc]=[[0,0],[xx,0],[xx,yy]].map(R),
+ render(p,W,H){const G=geo(p),fs=p.fontSize,u=p.unit,nf=mkNf(p.dec),xx=p.ref==='A'?G.adj:G.opp,yy=p.ref==='A'?G.opp:G.adj,th=p.rot*D,R=q=>rot([p.flipH?-q[0]:q[0],p.flipV?-q[1]:q[1]],th),[A,B,Cc]=[[0,0],[xx,0],[xx,yy]].map(R),
   seg={opp:p.ref==='A'?[B,Cc]:[A,B],adj:p.ref==='A'?[A,B]:[B,Cc],hyp:[A,Cc]},COL={opp:'#dc2626',adj:'#16a34a',hyp:'#2563eb'},W3=p.lab==='words',
   SN={opp:W3?'cateto opuesto':'a',adj:W3?'cateto adyacente':'b',hyp:W3?'hipotenusa':'c'},Ls=[],tv=nf(G.th),vs=k=>p.find===k?'x':nf(G[k]);
   RT.forEach(([key,fn,n,d])=>{if(p[key])Ls.push(`${TN[fn]} θ = ${SN[n]} / ${SN[d]} = ${vs(n)} / ${vs(d)} = ${nf(G[n]/G[d])}`)});
   if(p.find==='opp')Ls.push(`sen θ = x / ${nf(G.hyp)}   →   x = ${nf(G.hyp)} · sen ${tv}° = ${nf(G.opp)} ${u}`);else if(p.find==='adj')Ls.push(`cos θ = x / ${nf(G.hyp)}   →   x = ${nf(G.hyp)} · cos ${tv}° = ${nf(G.adj)} ${u}`);else if(p.find==='hyp')Ls.push(`sen θ = ${nf(G.opp)} / x   →   x = ${nf(G.opp)} / sen ${tv}° = ${nf(G.hyp)} ${u}`);
   const all=[A,B,Cc],xs=all.map(q=>q[0]),ys=all.map(q=>q[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),fl=fs*.78,below=Ls.length?Ls.length*fl*1.35+fs*.4:0,
    m=view(p,W,H,Math.max(x1-x0,y1-y0)/2*1.25,below,(x0+x1)/2,(y0+y1)/2),lw=Math.max(2,p.strokeW*.8),cen=[(A[0]+B[0]+Cc[0])/3,(A[1]+B[1]+Cc[1])/3];let g=`<polygon points="${all.map(q=>m.T(q).join(',')).join(' ')}" fill="${p.col}" stroke="${p.stroke}" stroke-width="${p.strokeW}" stroke-linejoin="round"/>`;
-  [['opp','sdO'],['adj','sdA'],['hyp','sdH']].forEach(([k,sd])=>{const[P1,P2]=seg[k];if(p.colorSides)g+=ln(m,P1,P2,COL[k],lw*1.3);
-   if(p[sd])g+=sideLab(m,p,P1,P2,p.showVal?`${SN[k]} = ${p.find===k?'x':nf(G[k])+' '+u}`:SN[k],p.colorSides?COL[k]:p.textColor,cen,1.0)});
+  const md={opp:p.mO,adj:p.mA,hyp:p.mH};['opp','adj','hyp'].forEach(k=>{const[P1,P2]=seg[k];if(p.colorSides)g+=ln(m,P1,P2,COL[k],lw*1.3);const t=Draw.lbl(md[k],SN[k],p.find===k?'x':nf(G[k])+' '+u);
+   if(t)g+=sideLab(m,p,P1,P2,t,p.colorSides?COL[k]:p.textColor,cen,1.0)});
   const rr=Math.min(xx,yy)*.22,thV=p.ref==='A'?A:Cc,oV=p.ref==='A'?Cc:A;
-  if(p.anT){const[s0,sp]=p.ref==='A'?between(A,B,Cc):between(Cc,B,A);g+=ang(m,p,thV,s0,sp,rr,'#7c3aed',`θ = ${tv}°`)}
-  if(p.anO){const[s0,sp]=p.ref==='A'?between(Cc,B,A):between(A,B,Cc);g+=ang(m,p,oV,s0,sp,rr,'#0891b2',`${nf(90-G.th)}°`)}
-  if(p.anR)g+=sq(m,B,A,Cc,Math.min(xx,yy)*.12,'#7c3aed',lw);
+  if(p.nT!=='off'){const[s0,sp]=p.ref==='A'?between(A,B,Cc):between(Cc,B,A);g+=ang(m,p,thV,s0,sp,rr,'#7c3aed',Draw.lbl(p.nT,'θ',`${tv}°`))}
+  if(p.nO!=='off'){const[s0,sp]=p.ref==='A'?between(Cc,B,A):between(A,B,Cc);g+=ang(m,p,oV,s0,sp,rr,'#0891b2',Draw.lbl(p.nO,'φ',`${nf(90-G.th)}°`))}
+  if(p.nR!=='off'){g+=sq(m,B,A,Cc,Math.min(xx,yy)*.12,'#7c3aed',lw);const t=Draw.lbl(p.nR,'γ','90°');if(t)g+=Draw.t(...m.T(add(B,mul(unit(add(sub(A,B),sub(Cc,B))),Math.min(xx,yy)*.3))),t,p,{c:'#7c3aed',w:700,b:'central',fs:fs*.75})}
   if(p.showPts)[[A,'A'],[B,'B'],[Cc,'C']].forEach(([q,t])=>g+=dot(m,p,q,t,p.stroke,unit(sub(q,cen))));
   Ls.forEach((t,i)=>g+=Draw.t(W/2,m.tH+m.av+fl*1.3+i*fl*1.35,t,p,{fs:fl}));
   return Draw.title(p,W)+g}});

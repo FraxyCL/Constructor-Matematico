@@ -19,7 +19,7 @@ App.init();items.forEach(c=>{S.cur=c.id;S.p();try{App.panel();App.draw();const h
 const has=(s,t)=>s.includes(t),val=(s,re)=>{const m=s.match(re);return m?parseFloat(m[1].replace(',','.')):NaN},near=(a,b,t)=>Math.abs(a-b)<t;
 let s=run('triangle',{type:'esc',med:true,bis:true,alt:true,mtz:true});ck('G,I,H visibles',has(s,'>G<')&&has(s,'>I<')&&has(s,'>H<'));
 s=run('triangle',{type:'obt',alt:true});ck('H oculto sin prolongar',!has(s,'>H<'));s=run('triangle',{type:'obt',alt:true,xAlt:500});ck('H con prolongación',has(s,'>H<'));
-s=run('triangle',{type:'esc',showA:true,showM:true,angV0:false,angV2:false,sideV1:false});ck('visibilidad selectiva',(s.match(/°/g)||[]).length===1&&(s.match(/ cm/g)||[]).length===2);
+s=run('triangle',{type:'esc',showA:true,showM:true,angV0:'off',angV2:'off',sideV1:'off'});ck('visibilidad selectiva',(s.match(/°/g)||[]).length===1&&(s.match(/ cm/g)||[]).length===2);
 s=run('circle',{showDia:true,showCho:true,showArc:true,showPA:true,kind:'disc'});ck('circunferencia',['d = 8 cm','arco FG = 90°','L = 2·π·r','A = π·r²'].every(t=>has(s,t)));
 const cls=v=>(run('circle-two',v).match(/>([^<]*(?:exteriores|secantes|Tangentes|interiores|concéntricas|coincidentes))</)||[])[1];ck('posiciones relativas',cls({dist:9})==='Circunferencias exteriores'&&cls({dist:7})==='Tangentes exteriores'&&cls({dist:5})==='Circunferencias secantes'&&cls({dist:1})==='Tangentes interiores'&&cls({dist:0})==='Circunferencias concéntricas');
 s=run('stat-table',{});ck('tabla de frecuencias',has(s,'Total')&&has(s,'>13<'));
@@ -42,4 +42,23 @@ s=run('thales-triangle',{fig:'x'});ck('thales en X',has(s,'AB / AD = AC / AE = B
 s=run('trig-ratios');ck('razones 35°',has(s,'0,574')&&has(s,'0,819')&&has(s,'0,7'));s=run('trig-ratios',{find:'opp'});ck('trig despeje',has(s,'x = 10 · sen 35° = 5,736 cm'));
 s=run('trig-circle',{th:30});ck('circunferencia goniométrica',has(s,'sen θ = 0,5')&&has(s,'cos θ = 0,866'));s=run('trig-circle',{th:90});ck('tan 90° no definida',has(s,'no definida'));
 s=run('trig-table',{form:'both'});ck('tabla notables',has(s,'√3')&&has(s,'≈ 0,866'));
+// nueva versión: encabezado, modos de rotulado por elemento y espejo
+ck('encabezado',read('index.html').includes('Profesor Michael Núñez²'));
+s=run('triangle',{type:'esc',showA:true,angV0:'both',angV1:'name',angV2:'off'});ck('ángulos: nombre y valor / solo nombre / oculto',/α = [\d,]+°/.test(s)&&has(s,'>β<')&&!has(s,'γ'));
+s=run('triangle',{type:'esc',showM:true,sideV0:'name',sideV1:'both',sideV2:'val'});ck('lados: modos',has(s,'>AB<')&&/BC = [\d,]+ cm/.test(s)&&/>[\d,]+ cm</.test(s));
+s=run('pyth',{squares:false,mA:'val',mB:'name',mC:'off'});ck('pitágoras: lados por modo',has(s,'>3 cm<')&&has(s,'>b<')&&!has(s,'c = ')&&!has(s,'>c<'));
+s=run('pyth',{squares:false,nA:'both',nB:'name',nC:'both'});ck('pitágoras: ángulos por modo',/α = 36,87°/.test(s)&&has(s,'>β<')&&has(s,'γ = 90°'));
+s=run('pyth',{nC:'mark'});ck('ángulo recto solo marca',!has(s,'γ'));
+s=run('trig-ratios',{mO:'name',mH:'val',mA:'off',nT:'name',nR:'both',nO:'both'});ck('trigonometría: modos',has(s,'>cateto opuesto<')&&has(s,'>10 cm<')&&!has(s,'>cateto adyacente = ')&&has(s,'>θ<')&&has(s,'γ = 90°')&&/φ = 55°/.test(s));
+const tx=(s)=>{const m=s.match(/<polygon points="([^"]+)"/);return m[1].split(' ').map(q=>q.split(',').map(Number))};
+const ref=tx(run('pyth',{squares:false})),fh=tx(run('pyth',{squares:false,flipH:true})),fv=tx(run('pyth',{squares:false,flipV:true}));
+ck('espejo horizontal (pitágoras)',ref.every((q,i)=>near(fh[i][0],800-q[0],.01)&&near(fh[i][1],q[1],.01)));const sy=Math.min(...ref.map(q=>q[1]))+Math.max(...ref.map(q=>q[1]));ck('espejo vertical (pitágoras)',ref.every((q,i)=>near(fv[i][0],q[0],.01)&&near(fv[i][1],sy-q[1],.01)));
+const rt=tx(run('trig-ratios')),rth=tx(run('trig-ratios',{flipH:true}));ck('espejo horizontal (trigonometría)',rt.every((q,i)=>near(rth[i][0],800-q[0],.01)&&near(rth[i][1],q[1],.01)));
+const g1=tx(run('triangle',{type:'esc'})),g2=tx(run('triangle',{type:'esc',flipH:true}));ck('espejo en geometría',g1.every((q,i)=>near(g2[i][0],800-q[0],.01)&&near(g2[i][1],q[1],.01)));
+s=run('triangle',{type:'obt',alt:true,xAlt:500,flipH:true,rot:30});ck('espejo + centros',has(s,'>H<'));
+s=run('thales-lines',{sg0:'name',sg1:'val',sg2:'off'});ck('thales paralelas: modos',has(s,'>AB<')&&/>[\d,]+ cm</.test(s));
+s=run('thales-triangle',{s0:'val',s1:'name',s2:'off',s3:'off',s4:'off',s5:'off'});ck('thales triángulo: modos',has(s,'>2 cm<')&&has(s,'>DB<')&&!has(s,'AE = '));
+s=run('angle-lines',{ang0:'name',ang1:'val',ang2:'both',ang3:'off'});ck('rectas cortadas: modos',has(s,'>∠1<')&&has(s,'>65°<')&&has(s,'∠3 = 65°')&&!has(s,'∠4'));
+s=run('circle',{lmRad:'name',showDia:true,lmDia:'val'});ck('circunferencia: modos',has(s,'>r<')&&!has(s,'r = 4 cm')&&has(s,'>8 cm<'));
+s=run('circle-angles',{kind:'inscribed',lm:'both'});ck('ángulos en la circunferencia: modos',has(s,'∠ACB = 60°')&&has(s,'arco AB = 120°'));
 console.log(bad?`\n${bad} FALLAS`:'\nTodo en orden',`(${n} renders, ${items.length} construcciones)`);process.exit(bad?1:0);

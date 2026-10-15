@@ -5,23 +5,23 @@ const {P,C,K}=Registry.h;
 const on=(...t)=>p=>t.includes(p.type);
 const common=(cnt,max)=>[C('fill','Color de relleno','#93c5fd','Apariencia'),P('op','Opacidad del relleno (%)',60,0,100,'Apariencia',{style:true}),
  C('stroke','Color del contorno','#1e3a8a','Apariencia'),P('strokeW','Grosor del contorno',3,1,12,'Apariencia',{style:true}),
- P('size','Tamaño de la figura (%)',75,30,100,'Apariencia',{style:true}),P('rot','Orientación (°)',0,0,359,'Apariencia'),
+ P('size','Tamaño de la figura (%)',75,30,100,'Apariencia',{style:true}),P('rot','Orientación (°)',0,0,359,'Apariencia'),K('flipH','Espejo horizontal (voltear izquierda ↔ derecha)',false,'Apariencia'),K('flipV','Espejo vertical (voltear arriba ↔ abajo)',false,'Apariencia'),
  K('showV','Mostrar vértices',true,'Mostrar'),K('showN','Nombres de vértices',true,'Mostrar'),K('showM','Medidas de los lados',false,'Mostrar'),K('showA','Ángulos interiores',false,'Mostrar'),
  {key:'unit',label:'Unidad de medida',type:'text',def:'cm',group:'Mostrar'},...Registry.vis(cnt,max),...Registry.textStyle()];
 const diags=(V,c)=>{const o=[],n=V.length;for(let i=0;i<n;i++)for(let j=i+2;j<n;j++)if(!(i===0&&j===n-1))o.push({a:V[i],b:V[j],c,d:'6 5'});return o};
 
 // Rotulado reutilizable (ángulos, medidas, vértices y nombres) respetando la visibilidad selectiva. S = vértices en pantalla; k = px por unidad.
 Draw.marks=(S,p,k,col,ln,sx,rv)=>{const n=S.length,fs=p.fontSize,c=mul(S.reduce(add,[0,0]),1/n),cw=S.reduce((a,q,i)=>a+q[0]*S[(i+1)%n][1]-S[(i+1)%n][0]*q[1],0)>0,sw=Math.max(1.5,ln*.6);let g='';
- if(p.showA)S.forEach((Pt,i)=>{if(p['angV'+i]===false)return;const Q=S[(i+n-1)%n],R=S[(i+1)%n],u1=unit(sub(cw?Q:R,Pt)),u2=unit(sub(cw?R:Q,Pt)),ang=Math.acos(Math.max(-1,Math.min(1,u1[0]*u2[0]+u1[1]*u2[1])))/D,r=Math.min(len(sub(R,Pt)),len(sub(Q,Pt)))*.22,a=add(Pt,mul(u1,r)),b=add(Pt,mul(u2,r)),st=`fill="none" stroke="${col}" stroke-width="${sw}"`;
+ if(p.showA)S.forEach((Pt,i)=>{const md=p['angV'+i]||'val';if(md==='off')return;const Q=S[(i+n-1)%n],R=S[(i+1)%n],u1=unit(sub(cw?Q:R,Pt)),u2=unit(sub(cw?R:Q,Pt)),ang=Math.acos(Math.max(-1,Math.min(1,u1[0]*u2[0]+u1[1]*u2[1])))/D,r=Math.min(len(sub(R,Pt)),len(sub(Q,Pt)))*.22,a=add(Pt,mul(u1,r)),b=add(Pt,mul(u2,r)),st=`fill="none" stroke="${col}" stroke-width="${sw}"`;
   g+=Math.abs(ang-90)<.01?`<polyline points="${a} ${add(a,mul(u2,r))} ${b}" ${st}/>`:`<path d="M${a} A${r} ${r} 0 0 0 ${b}" ${st}/>`;
-  const l=add(Pt,mul(unit(add(u1,u2)),r*1.9));g+=Draw.t(l[0],l[1],Draw.fmt(ang)+'°',p,{fs:fs*.6,b:'central'})});
- if(p.showM)S.forEach((Pt,i)=>{if(p['sideV'+i]===false)return;const R=S[(i+1)%n],m=mid(Pt,R),l=add(m,mul(unit(sub(m,c)),fs*.8));g+=Draw.t(l[0],l[1],Draw.fmt(len(sub(R,Pt))/k)+' '+p.unit,p,{fs:fs*.7,b:'central'})});
+  const l=add(Pt,mul(unit(add(u1,u2)),r*1.9));const tx=Draw.lbl(md,Draw.GR[i]+(sx?'′':''),Draw.fmt(ang)+'°');if(tx)g+=Draw.t(l[0],l[1],tx,p,{fs:fs*.6,b:'central'})});
+ if(p.showM)S.forEach((Pt,i)=>{const md=p['sideV'+i]||'val';if(md==='off')return;const R=S[(i+1)%n],m=mid(Pt,R),l=add(m,mul(unit(sub(m,c)),fs*.8)),tx=Draw.lbl(md,L[i]+sx+L[(i+1)%n]+sx,Draw.fmt(len(sub(R,Pt))/k)+' '+p.unit);if(tx)g+=Draw.t(l[0],l[1],tx,p,{fs:fs*.7,b:'central'})});
  if(p.showV)S.forEach(q=>g+=`<circle cx="${q[0]}" cy="${q[1]}" r="${rv||ln*1.5+2}" fill="${col}"/>`);
  if(p.showN)S.forEach((q,i)=>{const l=add(q,mul(unit(sub(q,c)),fs*.95));g+=Draw.t(l[0],l[1],L[i]+sx,p,{b:'central',w:700})});
  return g};
 // Motor común: V = vértices en antihorario (unidades, y hacia arriba); aux = segmentos auxiliares [{a,b,c,d}]
 function build(p,W,H,V,aux=[]){
- const th=p.rot*D,pts=V.map(v=>rotp(v,th)),mk=aux.filter(s=>s.pt),ax=aux.filter(s=>!s.pt).map(s=>({...s,a:rotp(s.a,th),b:rotp(s.b,th),ea:s.ea&&rotp(s.ea,th),eb:s.eb&&rotp(s.eb,th)})),
+ const th=p.rot*D,mr=v=>rotp([p.flipH?-v[0]:v[0],p.flipV?-v[1]:v[1]],th),pts=V.map(mr),mk=aux.filter(s=>s.pt),ax=aux.filter(s=>!s.pt).map(s=>({...s,a:mr(s.a),b:mr(s.b),ea:s.ea&&mr(s.ea),eb:s.eb&&mr(s.eb)})),
   all=pts.concat(ax.flatMap(s=>[s.a,s.b])),xs=all.map(q=>q[0]),ys=all.map(q=>q[1]),
   x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),tH=Draw.titleH(p),av=H-tH,fs=p.fontSize,pad=p.showN||p.showM?fs*2.2:fs*.6,
   k=Math.max(.01,Math.min((W*p.size/100-pad)/((x1-x0)||1),(av*p.size/100-pad)/((y1-y0)||1))),
@@ -30,7 +30,7 @@ function build(p,W,H,V,aux=[]){
  const sl=(a,b,s,x='')=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${s.c}" stroke-width="${Math.max(1.5,ln*.6)}" stroke-dasharray="${s.d||'8 6'}" ${x}/>`,X2='stroke-opacity=".55" clip-path="url(#cpg)"';
  ax.forEach(s=>{const a=M(s.a),b=M(s.b);g+=sl(a,b,s);if(s.ea)g+=sl(M(s.ea),a,s,X2)+sl(b,M(s.eb),s,X2)});
  g+=Draw.marks(S,p,k,p.stroke,ln,'');
- mk.forEach(s=>{const q=M(rotp(s.pt,th));g+=`<circle cx="${q[0]}" cy="${q[1]}" r="${ln*1.3+3}" fill="${s.c}" stroke="#fff" stroke-width="1.5"/>`+Draw.t(q[0]+fs*.6,q[1]-fs*.6,s.lab,p,{a:'start',c:s.c,w:700})});
+ mk.forEach(s=>{const q=M(mr(s.pt));g+=`<circle cx="${q[0]}" cy="${q[1]}" r="${ln*1.3+3}" fill="${s.c}" stroke="#fff" stroke-width="1.5"/>`+Draw.t(q[0]+fs*.6,q[1]-fs*.6,s.lab,p,{a:'start',c:s.c,w:700})});
  return Draw.title(p,W)+g}
 
 // ---------- Triángulos ----------

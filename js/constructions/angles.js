@@ -1,6 +1,6 @@
 // Ángulos: ángulo con transportador y rectas cortadas (opuestos por el vértice, correspondientes, alternos, conjugados)
 (()=>{
-const {P,C,K,S}=Registry.h,ts=()=>Registry.h.ts(26),f=x=>Draw.fmt(x+0),{pol,D}=Draw.v,{view,ln,arc,ang,dot,sq}=Draw.g;
+const {P,C,K,S,M}=Registry.h,ts=()=>Registry.h.ts(26),f=x=>Draw.fmt(x+0),{pol,D}=Draw.v,{view,ln,arc,ang,dot,sq}=Draw.g;
 const KINDS=[['acute','Agudo (menor que 90°)'],['right','Recto (90°)'],['obtuse','Obtuso (entre 90° y 180°)'],['straight','Llano (180°)'],['reflex','Cóncavo (entre 180° y 360°)'],['full','Completo (360°)'],['custom','Personalizado (0° a 360°)']];
 const PRE={acute:45,right:90,obtuse:120,straight:180,reflex:270,full:360},LIM={acute:[1,89],right:[90,90],obtuse:[91,179],straight:[180,180],reflex:[181,359],full:[360,360],custom:[0,360]};
 const CLS=m=>m===0?'Ángulo nulo':m<90?'Ángulo agudo':m===90?'Ángulo recto':m<180?'Ángulo obtuso':m===180?'Ángulo llano':m<360?'Ángulo cóncavo (mayor que 180°)':'Ángulo completo (360°)';
@@ -41,8 +41,8 @@ Registry.register({id:'angle-lines',category:'circles',name:'Rectas cortadas por
  parameters:[S('mode','Figura','parallel','Rectas',[['parallel','Dos paralelas y una transversal'],['cross','Dos rectas que se cortan']]),P('theta','Ángulo θ de la transversal (°)',65,10,170,'Rectas'),P('sep','Distancia entre las paralelas',4,2,8,'Rectas',{step:.5,show:p=>p.mode==='parallel'}),
   S('relP','Pares de ángulos a destacar','custom','Ángulos',[['custom','Elegir los ángulos a mano'],...Object.entries(RELP).map(([k,v])=>[k,v[0]])],p=>p.mode==='parallel'),
   S('relX','Pares de ángulos a destacar','custom','Ángulos',[['custom','Elegir los ángulos a mano'],...Object.entries(RELX).map(([k,v])=>[k,v[0]])],p=>p.mode==='cross'),
-  ...[...Array(8).keys()].map(i=>K('ang'+i,`Ángulo ∠${i+1}`,i<4,'Ángulos visibles',p=>(p.mode==='parallel'?p.relP:p.relX)==='custom'&&i<(p.mode==='parallel'?8:4))),
-  K('showVal','Mostrar la medida de cada ángulo',true,'Mostrar'),K('showRel','Escribir la relación entre los ángulos',true,'Mostrar'),K('showNames','Nombrar las rectas (L₁, L₂, T)',true,'Mostrar'),
+  ...[...Array(8).keys()].map(i=>M('ang'+i,`Ángulo ∠${i+1}`,i<4?'both':'off','Ángulos: qué texto mostrar',p=>(p.mode==='parallel'?p.relP:p.relX)==='custom'&&i<(p.mode==='parallel'?8:4))),
+  K('showVal','Mostrar el valor en los pares destacados',true,'Mostrar'),K('showRel','Escribir la relación entre los ángulos',true,'Mostrar'),K('showNames','Nombrar las rectas (L₁, L₂, T)',true,'Mostrar'),
   C('col','Color de las rectas','#1e293b','Estilo'),P('strokeW','Grosor de las rectas',3,1,10,'Estilo',{style:true}),P('size','Tamaño (%)',85,30,100,'Estilo',{style:true}),...ts(24)],
  render(p,W,H){const par=p.mode==='parallel',th=p.theta,s=Math.sin(th*D),cot=Math.cos(th*D)/s,sep=par?p.sep:0,fs=p.fontSize,V1=[0,sep/2],V2=par?[-sep*cot,-sep/2]:null,Lh=Math.max(5,(par?Math.abs(sep*cot):0)+3.5),
   e=Math.max(par?sep/s*.5+1:3,2.4),u=pol(th),tA=[V1[0]+u[0]*e,V1[1]+u[1]*e],tB=par?[V2[0]-u[0]*e,V2[1]-u[1]*e]:[V1[0]-u[0]*e,V1[1]-u[1]*e],
@@ -52,9 +52,9 @@ Registry.register({id:'angle-lines',category:'circles',name:'Rectas cortadas por
   g+=ln(m,[-Lh,V1[1]],[Lh,V1[1]],p.col,lw)+(par?ln(m,[-Lh,-sep/2],[Lh,-sep/2],p.col,lw):'')+ln(m,tA,tB,p.col,lw);
   if(par)[V1[1],-sep/2].forEach(y=>[0,.35].forEach(dx=>{const x=Lh*.8-dx;g+=`<polyline points="${[[x-.22,y+.2],[x,y],[x-.22,y-.2]].map(q=>m.T(q).join(',')).join(' ')}" fill="none" stroke="${p.col}" stroke-width="${lw*.8}"/>`}));
   if(p.showNames){g+=Draw.t(...m.T([Lh*.93,V1[1]+.55]),par?'L₁':'L₁',p,{w:700,fs:fs*.85})+(par?Draw.t(...m.T([Lh*.93,-sep/2+.55]),'L₂',p,{w:700,fs:fs*.85}):'')+Draw.t(...m.T([tA[0]+.4,tA[1]+.2]),'T',p,{w:700,fs:fs*.85})}
-  const vals=[180-th,th,th,180-th],vis=i=>R?R[2].flat().includes(i):!!p['ang'+i],pairOf=i=>R?R[2].findIndex(q=>q.includes(i)):-1,starts=[th,0,180,th+180],spans=[180-th,th,th,180-th];
-  for(let i=0;i<(par?8:4);i++){if(!vis(i))continue;const Vx=i<4?V1:V2,q=i%4,pi=pairOf(i),col=pi>=0?PC[pi%4]:(q===1||q===2?'#2563eb':'#dc2626');
-   g+=ang(m,p,Vx,starts[q],spans[q],ra,col,`∠${i+1}${p.showVal?' = '+f(vals[q])+'°':''}`)}
+  const vals=[180-th,th,th,180-th],vis=i=>R?(R[2].flat().includes(i)?(p.showVal?'both':'name'):'off'):p['ang'+i],pairOf=i=>R?R[2].findIndex(q=>q.includes(i)):-1,starts=[th,0,180,th+180],spans=[180-th,th,th,180-th];
+  for(let i=0;i<(par?8:4);i++){const md=vis(i);if(md==='off')continue;const Vx=i<4?V1:V2,q=i%4,pi=pairOf(i),col=pi>=0?PC[pi%4]:(q===1||q===2?'#2563eb':'#dc2626');
+   g+=ang(m,p,Vx,starts[q],spans[q],ra,col,Draw.lbl(md,`∠${i+1}`,`${f(vals[q])}°`))}
   if(R&&p.showRel)R[2].forEach((pr,i)=>g+=Draw.t(W/2,m.tH+m.av+fs*1.25+i*fs*1.25,`${R[0]}: ∠${pr[0]+1} ${R[1]?'=':'+'} ∠${pr[1]+1}${R[1]?'':' = 180°'}${p.showVal?`  (${f(vals[pr[0]%4])}° ${R[1]?'=':'+'} ${f(vals[pr[1]%4])}°)`:''}`,{...p,textColor:PC[i%4]},{fs:fs*.8,w:700}));
   return Draw.title(p,W)+g}});
 })();

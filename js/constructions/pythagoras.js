@@ -1,6 +1,6 @@
 // Teorema de Pitágoras: figura con cuadrados sobre los lados (con resolución de un lado desconocido) y demostración visual por reordenamiento
 (()=>{
-const {P,C,K,S}=Registry.h,ts=()=>Registry.h.ts(24),f=x=>Draw.fmt(x+0),{D,add,sub,mul,unit,rot}=Draw.v,{view,ln,sq,dot,ang,between,sideLab}=Draw.g;
+const {P,C,K,S,M}=Registry.h,ts=()=>Registry.h.ts(24),f=x=>Draw.fmt(x+0),{D,add,sub,mul,unit,rot}=Draw.v,{view,ln,sq,dot,ang,between,sideLab}=Draw.g;
 const TR={'345':[3,4],'51213':[5,12],'81517':[8,15],'72425':[7,24],'6810':[6,8]};
 const trip=()=>[S('trip','Terna / medidas','345','Triángulo',[['345','Terna 3 · 4 · 5'],['51213','Terna 5 · 12 · 13'],['81517','Terna 8 · 15 · 17'],['72425','Terna 7 · 24 · 25'],['6810','Terna 6 · 8 · 10'],['custom','Medidas libres']]),{key:'_t',type:'text',def:'345',show:()=>false},
  P('a','Cateto a (cm)',3,1,25,'Triángulo',{step:.5}),P('b','Cateto b (cm)',4,1,25,'Triángulo',{step:.5})];
@@ -10,13 +10,13 @@ const style=()=>[C('colTri','Color del triángulo','#fde68a','Estilo'),C('colA',
  P('strokeW','Grosor del contorno',3,1,10,'Estilo',{style:true}),P('op','Opacidad de los colores (%)',85,10,100,'Estilo',{style:true}),P('size','Tamaño de la figura (%)',80,30,100,'Estilo',{style:true}),...ts()];
 
 Registry.register({id:'pyth',category:'theorems',name:'Teorema de Pitágoras',icon:'📐',description:'Triángulo rectángulo con cuadrados sobre los lados, cálculo de un lado desconocido y desarrollo',
- parameters:[...trip(),S('find','Lado que se pide calcular (x)','none','Resolución',[['none','Ninguno (mostrar todas las medidas)'],['c','Hipotenusa c'],['a','Cateto a'],['b','Cateto b']]),P('rot','Giro de la figura (°)',0,0,359,'Triángulo'),
+ parameters:[...trip(),S('find','Lado que se pide calcular (x)','none','Resolución',[['none','Ninguno (mostrar todas las medidas)'],['c','Hipotenusa c'],['a','Cateto a'],['b','Cateto b']]),P('rot','Giro de la figura (°)',0,0,359,'Triángulo'),K('flipH','Espejo horizontal (voltear izquierda ↔ derecha)',false,'Triángulo'),K('flipV','Espejo vertical (voltear arriba ↔ abajo)',false,'Triángulo'),
   K('squares','Cuadrados sobre los lados',true,'Cuadrados'),K('sqLabel','Área de cada cuadrado',true,'Cuadrados',p=>p.squares),K('sqGrid','Cuadrícula unitaria dentro de los cuadrados',false,'Cuadrados',p=>p.squares),
-  K('lsA','Lado a',true,'Lados visibles'),K('lsB','Lado b',true,'Lados visibles'),K('lsC','Lado c',true,'Lados visibles'),K('showVal','Mostrar las medidas',true,'Lados visibles'),
-  K('anA','Ángulo en A (α)',false,'Ángulos visibles'),K('anB','Ángulo en B (β)',false,'Ángulos visibles'),K('anC','Ángulo recto en C',true,'Ángulos visibles'),
+  M('mA','Lado a (BC)','both','Lados: qué texto mostrar'),M('mB','Lado b (CA)','both','Lados: qué texto mostrar'),M('mC','Lado c (AB, hipotenusa)','both','Lados: qué texto mostrar'),
+  M('nA','Ángulo en A (α)','off','Ángulos: qué texto mostrar'),M('nB','Ángulo en B (β)','off','Ángulos: qué texto mostrar'),M('nC','Ángulo recto en C (γ)','mark','Ángulos: qué texto mostrar',undefined,Registry.h.LMR),
   K('showPts','Nombrar los vértices A, B y C',true,'Mostrar'),K('showEq','Escribir el teorema',true,'Mostrar'),K('showSteps','Escribir el desarrollo numérico',true,'Mostrar'),Registry.h.UN(),...style()],
  normalize:tripNorm,
- render(p,W,H){const a=p.a,b=p.b,c=Math.hypot(a,b),u=p.unit,fs=p.fontSize,th=p.rot*D,R=q=>rot(q,th),Ap=[0,b],Bp=[a,0],Cp=[0,0],nn=[b/c,a/c],
+ render(p,W,H){const a=p.a,b=p.b,c=Math.hypot(a,b),u=p.unit,fs=p.fontSize,th=p.rot*D,R=q=>rot([p.flipH?-q[0]:q[0],p.flipV?-q[1]:q[1]],th),Ap=[0,b],Bp=[a,0],Cp=[0,0],nn=[b/c,a/c],
   S0=p.squares?{a:[Cp,Bp,[a,-a],[0,-a]],b:[Cp,Ap,[-b,b],[-b,0]],c:[Ap,Bp,add(Bp,mul(nn,c)),add(Ap,mul(nn,c))]}:{},SQ={};Object.keys(S0).forEach(k=>SQ[k]=S0[k].map(R));
   const T3=[Ap,Bp,Cp].map(R),[A,B,Cc]=T3,all=[...T3,...Object.values(SQ).flat()],xs=all.map(q=>q[0]),ys=all.map(q=>q[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),
    real={a,b,c},val=k=>p.find===k?'x':f(real[k])+' '+u,sqv=k=>p.find===k?'x²':f(real[k]**2)+' '+u+'²',Ls=[];
@@ -28,13 +28,13 @@ Registry.register({id:'pyth',category:'theorems',name:'Teorema de Pitágoras',ic
   [['a',p.colA],['b',p.colB],['c',p.colC]].forEach(([k,col])=>{if(SQ[k])g+=poly(m,SQ[k],col,p)});g+=poly(m,T3,p.colTri,p);
   if(p.squares&&p.sqGrid){const G=(O,uu,vv,s)=>{let o='';for(let i=1;i<s;i++){const o1=add(O,mul(uu,i)),o2=add(O,mul(vv,i));o+=ln(m,R(o1),R(add(o1,mul(vv,s))),p.stroke,1,0,'stroke-opacity=".45"')+ln(m,R(o2),R(add(o2,mul(uu,s))),p.stroke,1,0,'stroke-opacity=".45"')}return o};
    g+=G(Cp,[1,0],[0,-1],a)+G(Cp,[0,1],[-1,0],b)+G(Ap,unit(sub(Bp,Ap)),nn,c)}
-  const lsOn={a:p.lsA,b:p.lsB,c:p.lsC},sd=k=>p.showVal?`${k} = ${val(k)}`:k;
-  if(!p.squares)[['a',B,Cc],['b',Cc,A],['c',A,B]].forEach(([k,P1,P2])=>{if(lsOn[k])g+=sideLab(m,p,P1,P2,sd(k),p.stroke,cen,1.1)});
-  else[['a','a²'],['b','b²'],['c','c²']].forEach(([k,nm])=>{const q=SQ[k],cc=m.T([q.reduce((s,z)=>s+z[0],0)/4,q.reduce((s,z)=>s+z[1],0)/4]),ls=[];if(lsOn[k])ls.push(sd(k));if(p.sqLabel)ls.push(`${nm} = ${sqv(k)}`);
-   ls.forEach((t,i)=>g+=Draw.t(cc[0],cc[1]+(i-(ls.length-1)/2)*fs*1.15,t,p,{b:'central',w:700,fs:fs*.8}))});
+  const md={a:p.mA,b:p.mB,c:p.mC},sd=k=>Draw.lbl(md[k],k,val(k));
+  if(!p.squares)[['a',B,Cc],['b',Cc,A],['c',A,B]].forEach(([k,P1,P2])=>{const t=sd(k);if(t)g+=sideLab(m,p,P1,P2,t,p.stroke,cen,1.1)});
+  else[['a','a²'],['b','b²'],['c','c²']].forEach(([k,nm])=>{const q=SQ[k],cc=m.T([q.reduce((s,z)=>s+z[0],0)/4,q.reduce((s,z)=>s+z[1],0)/4]),ls=[],t=sd(k);if(t)ls.push(t);if(p.sqLabel)ls.push(`${nm} = ${sqv(k)}`);
+   ls.forEach((t2,i)=>g+=Draw.t(cc[0],cc[1]+(i-(ls.length-1)/2)*fs*1.15,t2,p,{b:'central',w:700,fs:fs*.8}))});
   const aA=Math.atan2(a,b)/D,aB=Math.atan2(b,a)/D,rr=Math.min(a,b)*.2;
-  if(p.anA){const[s0,sp]=between(A,B,Cc);g+=ang(m,p,A,s0,sp,rr,'#dc2626',p.showVal?`α = ${f(aA)}°`:'α')}if(p.anB){const[s0,sp]=between(B,A,Cc);g+=ang(m,p,B,s0,sp,rr,'#2563eb',p.showVal?`β = ${f(aB)}°`:'β')}
-  if(p.anC)g+=sq(m,Cc,B,A,Math.min(a,b)*.16,'#dc2626',lw);
+  if(p.nA!=='off'){const[s0,sp]=between(A,B,Cc);g+=ang(m,p,A,s0,sp,rr,'#dc2626',Draw.lbl(p.nA,'α',`${f(aA)}°`))}if(p.nB!=='off'){const[s0,sp]=between(B,A,Cc);g+=ang(m,p,B,s0,sp,rr,'#2563eb',Draw.lbl(p.nB,'β',`${f(aB)}°`))}
+  if(p.nC!=='off'){g+=sq(m,Cc,B,A,Math.min(a,b)*.16,'#dc2626',lw);const t=Draw.lbl(p.nC,'γ','90°');if(t)g+=Draw.t(...m.T(add(Cc,mul(unit(add(sub(B,Cc),sub(A,Cc))),Math.min(a,b)*.34))),t,p,{c:'#dc2626',w:700,b:'central',fs:fs*.75})}
   if(p.showPts)[[A,'A'],[B,'B'],[Cc,'C']].forEach(([q,nm])=>g+=dot(m,p,q,nm,p.stroke,unit(sub(q,cen))));
   Ls.forEach((t,i)=>g+=Draw.t(W/2,m.tH+m.av+fs*1.2+i*fs*1.3,t,p,{fs:fs*.9,w:i===0&&p.showEq?700:400}));
   return Draw.title(p,W)+g}});

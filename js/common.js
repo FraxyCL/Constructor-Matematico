@@ -10,6 +10,12 @@ Registry.h={
  ts:(size=24)=>Registry.textStyle().map(q=>q.key==='fontSize'?{...q,def:size,min:8}:q),
  UN:(def='cm')=>({key:'unit',label:'Unidad de medida',type:'text',def,group:'Mostrar'})
 };
+// Rotulado de ángulos y lados: cada elemento elige 'off' | 'val' (solo valor) | 'name' (solo nombre) | 'both' (nombre = valor)
+Registry.h.LM=[['off','Oculto'],['val','Solo el valor'],['name','Solo el nombre'],['both','Nombre y valor']];
+Registry.h.LMR=[['off','Oculto'],['mark','Solo la marca del ángulo recto'],['val','Solo el valor'],['name','Solo el nombre'],['both','Nombre y valor']];
+Registry.h.M=(key,label,def,group,show,opts)=>({key,label,def,group,type:'select',options:opts||Registry.h.LM,show});
+Draw.lbl=(mode,name,val)=>mode==='val'?val:mode==='name'?name:mode==='both'?`${name} = ${val}`:'';
+Draw.GR='αβγδεζηθικλμνξπρστυφ'.split('');
 (()=>{
 const D=Math.PI/180,add=(a,b)=>[a[0]+b[0],a[1]+b[1]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],mul=(a,k)=>[a[0]*k,a[1]*k],len=a=>Math.hypot(a[0],a[1]),unit=a=>mul(a,1/(len(a)||1)),mid=(a,b)=>mul(add(a,b),.5),
  rot=(a,t)=>[a[0]*Math.cos(t)-a[1]*Math.sin(t),a[0]*Math.sin(t)+a[1]*Math.cos(t)],
