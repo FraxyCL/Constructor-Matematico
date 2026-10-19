@@ -35,3 +35,8 @@ body.dark #panel input[type=text],body.dark #panel input[type=number],body.dark 
 body.dark .cat-h{color:#e2e8f0}body.dark .cat-h:hover,body.dark button.item:hover{background:#1f2937}body.dark .item{color:#cbd5e1}body.dark .item.on{background:#4f46e5;color:#fff}
 body.dark .soon{color:#64748b}body.dark .soon em{background:#1f2937}body.dark #viewport{background:#0b1220}body.xv.dark #viewport{background:#fff}
 body.dark .zoombar{background:#111827;border-color:#1f2937;color:#e2e8f0}body.dark .zoombar button{color:#e2e8f0}body.dark .zoombar button:hover{background:#1f2937}body.dark .ghost{color:#9ca3af;border-color:#475569}
+
+#visits{position:fixed;right:10px;bottom:6px;z-index:3;font:11px/1 system-ui,sans-serif;color:#94a3b8;opacity:.55;padding:3px 7px;border-radius:10px;background:rgba(148,163,184,.12);pointer-events:none;user-select:none;letter-spacing:.02em}
+#visits:hover{opacity:.9}
+body.xv #visits{display:none}
+body.dark #visits{color:#64748b}

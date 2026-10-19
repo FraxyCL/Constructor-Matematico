@@ -61,4 +61,49 @@ s=run('thales-triangle',{s0:'val',s1:'name',s2:'off',s3:'off',s4:'off',s5:'off'}
 s=run('angle-lines',{ang0:'name',ang1:'val',ang2:'both',ang3:'off'});ck('rectas cortadas: modos',has(s,'>∠1<')&&has(s,'>65°<')&&has(s,'∠3 = 65°')&&!has(s,'∠4'));
 s=run('circle',{lmRad:'name',showDia:true,lmDia:'val'});ck('circunferencia: modos',has(s,'>r<')&&!has(s,'r = 4 cm')&&has(s,'>8 cm<'));
 s=run('circle-angles',{kind:'inscribed',lm:'both'});ck('ángulos en la circunferencia: modos',has(s,'∠ACB = 60°')&&has(s,'arco AB = 120°'));
+// MCM
+const mc=(v)=>run('mcm',v);
+s=mc({});ck('MCM(6, 8) = 24',has(s,'MCM(6, 8) = 24'));
+s=mc({nums:'4 6 10',method:'ladder'});ck('MCM de 3 números (60) y escalera',has(s,'MCM(4, 6, 10) = 60')&&has(s,'2² · 3 · 5'));
+s=mc({nums:'12, 18; 30; 45',method:'factors'});ck('MCM de 4 números y factores',has(s,'= 180')&&has(s,'2² · 3² · 5'));
+s=mc({nums:'6 8',method:'list'});ck('lista de múltiplos',has(s,'M(6)')&&has(s,'>24<'));
+s=mc({nums:'3 4',method:'jumps',more:true});ck('saltos, 2.º múltiplo común',has(s,'MCM = 12')&&has(s,'>24<'));
+s=mc({nums:'23 29',method:'list'});ck('MCM grande: aviso en lista',has(s,'demasiados múltiplos')&&has(s,'667'));
+s=mc({nums:'99991 99989 99971',method:'ladder'});ck('MCM enorme (BigInt)',has(s,'MCM(99991, 99989, 99971) = 999.510.'));
+s=mc({nums:'5'});ck('un solo número: aviso',has(s,'al menos dos números'));
+s=mc({nums:'7 7',method:'bars'});ck('números iguales',has(s,'MCM(7, 7) = 7'));
+// Factores primos
+const pf=(v)=>run('primefactors',v);
+s=pf({});ck('60 = 2² · 3 · 5 (árbol)',has(s,'60 = 2² · 3 · 5')&&has(s,'60 = 2 · 2 · 3 · 5'));
+s=pf({nums:'97'});ck('97 es primo',has(s,'97 es un número primo'));
+s=pf({nums:'1'});ck('1 no es primo ni compuesto',has(s,'1 no es primo ni compuesto'));
+s=pf({nums:'360',strat:'pair',dir:'right'});ck('360 en pares, árbol a la derecha',has(s,'360 = 2³ · 3² · 5'));
+s=pf({nums:'360',method:'ladder'});ck('escalera 360',has(s,'>360<')&&has(s,'>5<'));
+s=pf({nums:'360',method:'pow'});ck('burbujas 360',has(s,'>2³<')&&has(s,'>3²<'));
+s=pf({nums:'36 48 90',showCount:true,showList:true});ck('3 números: divisores',has(s,'Cantidad de divisores: (2+1) · (2+1) = 9')&&has(s,'Divisores de 36:'));
+const cnt=(s)=>(s.match(/<circle/g)||[]).length;ck('niveles visibles',cnt(pf({lev:1}))===1&&cnt(pf({lev:2}))===3&&cnt(pf({lev:20}))===cnt(pf({}))&&cnt(pf({}))===7);
+s=pf({nums:'65536'});ck('2^16 cabe',has(s,'2¹⁶'));s=pf({nums:'99991'});ck('primo grande',has(s,'es un número primo'));
+// MCD
+const gd=(v)=>run('mcd',v);
+s=gd({});ck('MCD(12, 18) = 6',has(s,'MCD(12, 18) = 6')&&has(s,'12 = 6 × 2'));
+s=gd({nums:'12 18 30',method:'divs'});ck('MCD de 3 números y divisores',has(s,'MCD(12, 18, 30) = 6')&&has(s,'Divisores de 30'));
+s=gd({nums:'48 180',method:'euclid'});ck('Euclides 48 y 180',has(s,'MCD(48, 180) = 12')&&has(s,'180 = 48 · 3 + 36')&&has(s,'36 = 12 · 3 + 0'));
+s=gd({nums:'48 180 100',method:'euclid'});ck('Euclides encadenado',has(s,'MCD(48, 180, 100) = 4'));
+s=gd({nums:'36 60 84',method:'factors'});ck('MCD por factores',has(s,'MCD(36, 60, 84) = 12')&&has(s,'2² · 3'));
+s=gd({nums:'36 60 84',method:'ladder'});ck('MCD por escalera',has(s,'= 2 · 2 · 3 = 12'));
+s=gd({nums:'8 15',method:'ladder'});ck('primos entre sí (escalera)',has(s,'primos entre sí')&&has(s,'No hay ningún primo'));
+s=gd({nums:'12 18',method:'rect'});ck('cuadrados de Euclides',has(s,'mide 6'));
+s=gd({nums:'12 18',method:'bars',test:4});ck('bloque de prueba que no sirve',has(s,'4 no divide a todos')&&has(s,'sobra 2'));
+s=gd({nums:'12 18',showRel:true});ck('relación MCD × MCM',has(s,'6 × 36 = 216 = 12 × 18'));
+for(const m of ['bars','rect','divs','euclid','factors','ladder']){s=gd({nums:'99991 99989',method:m});ck('MCD grande/primos, '+m,has(s,'MCD(99991, 99989) = 1'))}
+s=gd({nums:'1 1',method:'factors'});ck('MCD de unos',has(s,'= 1'));
+s=gd({nums:'7'});ck('MCD un solo número',has(s,'al menos dos'));
+// Fracción rectangular impropia
+const fr=(v)=>run('fraction-rect',v);
+s=fr({rows:1,cols:4,num:7,showMixed:true});ck('7/4 = 1 3/4',has(s,'7/4 = 1 3/4')&&(s.match(/<rect/g)||[]).length>=8);
+s=fr({rows:1,cols:3,num:5,showMixed:true});ck('5/3 = 1 2/3',has(s,'5/3 = 1 2/3'));
+s=fr({rows:1,cols:4,num:8});ck('8/4 = 2',has(s,'8/4 = 2'));
+s=fr({rows:1,cols:4,num:3});ck('propia sin mixto',!has(s,'entero'));
+const fills=(s,c)=>(s.match(new RegExp('fill="'+c+'"','g'))||[]).length;
+ck('celdas pintadas = numerador',fills(fr({rows:2,cols:3,num:11}),'#f97316')===11);
 console.log(bad?`\n${bad} FALLAS`:'\nTodo en orden',`(${n} renders, ${items.length} construcciones)`);process.exit(bad?1:0);
