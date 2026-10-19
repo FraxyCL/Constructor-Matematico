@@ -7,6 +7,7 @@ const Registry={
   {id:'theorems',name:'Teoremas y trigonometría',icon:'🔺',planned:[]},
   {id:'fractions',name:'Números y fracciones',icon:'🔢',planned:[]},
   {id:'data',name:'Datos y estadística',icon:'📊',planned:[]},
+  {id:'combinatorics',name:'Combinatoria',icon:'🎲',planned:[]},
   {id:'functions',name:'Funciones',icon:'📈',planned:[]},
   {id:'transforms',name:'Transformaciones',icon:'🔄',planned:[]},
   {id:'circles',name:'Circunferencia y ángulos',icon:'⭕',planned:[]},

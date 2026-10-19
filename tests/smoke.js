@@ -106,4 +106,28 @@ s=fr({rows:1,cols:4,num:8});ck('8/4 = 2',has(s,'8/4 = 2'));
 s=fr({rows:1,cols:4,num:3});ck('propia sin mixto',!has(s,'entero'));
 const fills=(s,c)=>(s.match(new RegExp('fill="'+c+'"','g'))||[]).length;
 ck('celdas pintadas = numerador',fills(fr({rows:2,cols:3,num:11}),'#f97316')===11);
+// Combinatoria
+const cm=(id,v)=>run(id,v);
+s=cm('comb-mult',{});ck('principio multiplicativo 3 × 2 = 6',has(s,'3 × 2 = 6 combinaciones')&&has(s,'roja – negro'));
+s=cm('comb-mult',{method:'table'});ck('tabla de doble entrada',has(s,'>Polera<')&&has(s,'>6<'));
+s=cm('comb-mult',{st:'A: 1, 2, 3\nB: x, y\nC: p, q, r, s',method:'boxes'});ck('3 elecciones: 3 × 2 × 4 = 24',has(s,'3 × 2 × 4 = 24'));
+s=cm('comb-mult',{st:'A: 1,2,3,4,5,6,7,8\nB: 1,2,3,4,5,6,7,8\nC: 1,2,3,4,5,6,7,8'});ck('árbol demasiado grande: aviso',has(s,'demasiados'));
+s=cm('comb-perm',{});ck('P(3) = 6',has(s,'P(3) = 3! = 6'));
+s=cm('comb-perm',{el:'A B C D E',r:3,method:'boxes'});ck('P(5, 3) = 60',has(s,'P(5, 3) = 5! / (5−3)! = 60')&&has(s,'5 × 4 × 3 = 60'));
+s=cm('comb-perm',{el:'MAMA',kind:'rep'});ck('anagramas de MAMA = 6',has(s,'4! / (2! · 2!) = 6'));
+s=cm('comb-perm',{el:'A B C D',kind:'circ'});ck('circulares: (4−1)! = 6',has(s,'(4−1)! = 3! = 6'));
+s=cm('comb-perm',{el:'A B C D E F',r:6,method:'list'});ck('720 ordenaciones en lista',has(s,'P(6) = 6! = 720')&&has(s,'ABCDEF')&&has(s,'FEDCBA'));
+s=cm('comb-comb',{});ck('C(4, 2) = 6',has(s,'C(4, 2) = 4! / (2! · 2!) = 6')&&has(s,'{A, B}')&&has(s,'{C, D}'));
+s=cm('comb-comb',{method:'pascal',el:'A B C D E',r:2});ck('Pascal C(5, 2) = 10',has(s,'>10<')&&has(s,'= 10'));
+s=cm('comb-comb',{method:'rel',el:'A B C D',r:3});ck('P(4,3)/3! = C(4,3)',has(s,'24 ordenaciones en total ÷ 6 = 4 grupos'));
+s=cm('comb-comb',{method:'tree',el:'A B C D E',r:3});ck('árbol de combinaciones C(5,3) = 10',has(s,'= 10')&&has(s,'>A, B, C<'));
+// Estadística extra
+s=cm('stat-stem',{});ck('tallo y hojas: n = 16',has(s,'n = 16 datos')&&has(s,'mediana = 34')&&has(s,'Clave: 3 | 5 significa 35'));
+s=cm('stat-stem',{data2:'10 14 18 22 25',n1:'A',n2:'B'});ck('tallo y hojas espalda con espalda',has(s,'A: mediana')&&has(s,'B: mediana = 18'));
+s=cm('stat-box',{});ck('caja: Q de Curso A',has(s,'Mín 4 · Q₁ 5 · Me 7 · Q₃ 8 · Máx 10 · RIC 3'));
+s=cm('stat-box',{data:'A; 2 4 5 6 6 7 8 9 10 30',whisk:'iqr',orient:'v'});ck('caja: valor atípico 30 fuera del bigote',has(s,'Máx 30')&&has(s,'<circle'));
+s=cm('stat-freqmean',{});ck('frecuencias: media 7 y moda 7',has(s,'112 / 16 = 7')&&has(s,'Moda: 7  (fi = 4)')&&has(s,'Mediana = 7'));
+s=cm('stat-freqmean',{group:'classes',data:'12 15 17 21 23 24 27 31 33 34 38 41 45 46 52 58',width:10});ck('intervalos: marca de clase y media 33,13',has(s,'[10, 20[')&&has(s,'530 / 16 = 33,13'));
+s=cm('stat-center',{});ck('media, mediana y moda',has(s,'= 60 / 10 = 6')&&has(s,'Moda = 6'));
+s=cm('stat-center',{data:'2 3 3 5 8 8 9 12'});ck('dos modas y mediana de dos datos',has(s,'Moda = 3 y 8')&&has(s,'= 6,5'));
 console.log(bad?`\n${bad} FALLAS`:'\nTodo en orden',`(${n} renders, ${items.length} construcciones)`);process.exit(bad?1:0);
