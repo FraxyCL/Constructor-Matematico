@@ -130,4 +130,38 @@ s=cm('stat-freqmean',{});ck('frecuencias: media 7 y moda 7',has(s,'112 / 16 = 7'
 s=cm('stat-freqmean',{group:'classes',data:'12 15 17 21 23 24 27 31 33 34 38 41 45 46 52 58',width:10});ck('intervalos: marca de clase y media 33,13',has(s,'[10, 20[')&&has(s,'530 / 16 = 33,13'));
 s=cm('stat-center',{});ck('media, mediana y moda',has(s,'= 60 / 10 = 6')&&has(s,'Moda = 6'));
 s=cm('stat-center',{data:'2 3 3 5 8 8 9 12'});ck('dos modas y mediana de dos datos',has(s,'Moda = 3 y 8')&&has(s,'= 6,5'));
+// Triángulo rectángulo a medida
+const tf=(v)=>run('trig-free',v);
+s=tf({});ck('a medida: θ=35 y c=10 completan catetos',has(s,'8,19 cm')&&has(s,'5,74 cm')&&has(s,'55°')&&!has(s,'no forman'));
+s=tf({theta:'30',hyp:'',opp:'5',rsin:true});ck('a medida: 30° y cateto 5 → hipotenusa 10',has(s,'>10 cm<')&&has(s,'sen θ = cateto opuesto / hipotenusa = 5 / 10 = 0,5'));
+s=tf({theta:'',opp:'3',adj:'4',hyp:'5',nT:'both'});ck('a medida: 3-4-5 da θ = 36,87°',has(s,'θ = 36,87°'));
+s=tf({theta:'30',opp:'9',adj:'4',hyp:'5'});ck('a medida: datos imposibles se dibujan igual con aviso',has(s,'no forman un triángulo')&&has(s,'>9 cm<')&&has(s,'>5 cm<')&&has(s,'>4 cm<')&&has(s,'30°'));
+s=tf({theta:'80',opp:'3',adj:'4',hyp:'5'});ck('a medida: ángulo incompatible con catetos',has(s,'no forman un triángulo')&&has(s,'80°'));
+s=tf({theta:'120',opp:'',hyp:''});ck('a medida: ángulo imposible no rompe',has(s,'no forman un triángulo')&&has(s,'120°'));
+s=tf({theta:'60',opp:'5√3',adj:'5',hyp:'10',mO:'both',nT:'both',lab:'letters'});ck('a medida: raíz escrita y consistente',has(s,'a = 5√3 cm')&&!has(s,'no forman'));
+s=tf({theta:'α',phi:'β',opp:'a',adj:'b',hyp:'c',nT:'both',nO:'both',mO:'both'});ck('a medida: solo letras',has(s,'θ = α')&&has(s,'φ = β')&&has(s,'cateto opuesto = a'));
+s=tf({mO:'off',mA:'off',mH:'off',nT:'off',nO:'off',nR:'off'});ck('a medida: todo oculto',!has(s,'cm')&&!has(s,'°'));
+s=tf({theta:'35',hyp:'10',fill:false,opp:'',adj:''});ck('a medida: sin completar no inventa valores',!has(s,'8,19')&&has(s,'>10 cm<'));
+s=tf({basis:'legs',opp:'3',adj:'4',theta:'35',hyp:''});ck('a medida: dibujo con los catetos',has(s,'no forman un triángulo')&&has(s,'>3 cm<'));
+// Ángulos y teoremas de la circunferencia
+const cpb=(v)=>run('circle-problems',v);
+s=cpb({});ck('circunferencia: inscrito x = ½ arco',has(s,'x:  ∠ACB = ½ · arco AB = ½ · 80° = 40°')&&has(s,'x = 40°'));
+s=cpb({mx_i1:'off',mx_c1:'x',mx_arc1:'val'});ck('circunferencia: central x = arco',has(s,'x:  ∠AOB = arco AB = 80°'));
+s=cpb({mx_i1:'val',mx_arc1:'x',mx_c1:'off'});ck('circunferencia: arco x = 2 · inscrito',has(s,'x:  arco AB = 2 · ∠ACB = 2 · 40° = 80°'));
+s=cpb({mx_i1:'off',mx_s1:'x',mx_q1:'y'});ck('circunferencia: semiinscrito y cuadrilátero (x e y)',has(s,'x:  ∠(t,AB) = ½ · arco AB = ½ · 80° = 40°')&&has(s,'y:  ∠DAB = ½ · (arco BC + arco CD) = ½ · (100° + 70°) = 85°'));
+s=cpb({kind:'int'});ck('ángulo interior: ½(80° + 70°) = 75°',has(s,'x:  ∠APB = ½ · (arco AB + arco CD) = ½ · (80° + 70°) = 75°'));
+s=cpb({kind:'int',in_a1:'val',in_arc1:'x',in_arc3:'val'});ck('ángulo interior: arco desconocido',has(s,'x:  2 · ∠APB = arco AB + arco CD')&&has(s,'= 80°'));
+s=cpb({kind:'ext'});ck('ángulo exterior (dos secantes) = 40°',has(s,'x:  ∠P = ½ · (arco BD − arco AC) = ½ · (130° − 50°) = 40°'));
+s=cpb({kind:'ext',extType:'tt',exN:120});ck('dos tangentes: 60°',has(s,'= ½ · (240° − 120°) = 60°')&&has(s,'180° − arco menor'));
+s=cpb({kind:'ext',extType:'ts',exN:40,exF:150});ck('tangente y secante (ángulo): 55°',has(s,'(150° − 40°) = 55°'));
+s=cpb({kind:'ext',ex_p:'val',ex_far:'x'});ck('ángulo exterior: arco lejano desconocido',has(s,'x:  arco BD = 2 · ∠P + arco AC = 2 · 40° + 50° = 130°'));
+s=cpb({kind:'chords'});ck('cuerdas: PD = 2 cm',has(s,'PD · PC = PA · PB')&&has(s,'PD = 4 · 3 / 6 = 2 cm')&&has(s,'x = 2 cm'));
+s=cpb({kind:'chords',ch_pa:'x',ch_pd:'val'});ck('cuerdas: PA desconocido = 4 cm',has(s,'PA = 6 · 2 / 3 = 4 cm'));
+s=cpb({kind:'secants'});ck('secantes: PD = 6 cm',has(s,'PD = 2 · 9 / 3 = 6 cm'));
+s=cpb({kind:'secants',sc_pa:'x',sc_pb:'y',sc_pd:'val'});ck('secantes: dos incógnitas',has(s,'PA = 3 · 6 / 9 = 2 cm')&&has(s,'PB = 3 · 6 / 2 = 9 cm'));
+s=cpb({kind:'tansec'});ck('tangente y secante: PB = 6²/4 = 9 cm',has(s,'PB = 6² / 4 = 9 cm'));
+s=cpb({kind:'tansec',ts_pt:'x',ts_pb:'val'});ck('tangente y secante: PT = √(4·9) = 6',has(s,'PT = √(4 · 9) = 6 cm'));
+s=cpb({kind:'tansec',ts_pb:'val',ts_pa:'x',ts_pt:'val'});ck('tangente y secante: PA = 36/9 = 4',has(s,'PA = 6² / 9 = 4 cm'));
+s=cpb({mx_arc1:'off',mx_c1:'off',mx_i1:'off',showThm:false,showSol:false});ck('circunferencia: todo oculto sin texto de ángulos',!has(s,'°'));
+for(const k of ['mix','int','ext','chords','secants','tansec'])for(const fl of [false,true]){s=cpb({kind:k,flipH:fl,flipV:fl,rot:33,showO:true});ck('circunferencia: '+k+' rotada/espejo',has(s,'<circle'))}
 console.log(bad?`\n${bad} FALLAS`:'\nTodo en orden',`(${n} renders, ${items.length} construcciones)`);process.exit(bad?1:0);
